@@ -8,4 +8,6 @@ if [[ -z "${OPENAI_API_KEY:-}" ]]; then
 fi
 
 python3 -m pip install -r requirements.txt
-python3 app.py --web
+
+# Use module invocation to avoid PATH issues when `streamlit` binary is not on PATH.
+python3 -m streamlit run web_app.py

@@ -31,57 +31,31 @@ export OPENAI_API_KEY="your_key_here"
 ## Run
 
 ```bash
-python app.py --transcript "Message Mark it's going to rain"
+# CLI
+python3 app.py --transcript "Message Mark it's going to rain"
+
+# Demo
+python3 app.py --demo
+
+# Web UI
+python3 -m streamlit run web_app.py
 ```
 
-You can also read from stdin:
+## One-command web launch
 
 ```bash
-echo "Blue tall doors look good for the exterior" | python app.py
+./run_web.sh
 ```
 
-## Output shape
+This installs dependencies and launches the Streamlit web interface.
 
-The app prints JSON like:
+## Notes
 
-```json
-{
-  "transcript": "Message Mark it's going to rain",
-  "classification": "Message",
-  "processed_output": {
-    "type": "Message",
-    "recipient": "Mark",
-    "message": "It's going to rain",
-    "priority": "normal",
-    "follow_up_needed": false
-  }
-}
-```
-
-## Demo mode (single command)
-
-Run a built-in set of example transcripts in one command:
-
-```bash
-python app.py --demo
-```
-
-This prints a JSON array of processed results for:
-- `Message Mark it's going to rain`
-- `Blue tall doors look good for the exterior`
-- `Remind me tomorrow at 9am to submit the permit`
-- `Can you ask the contractor for the updated timeline?`
-
-## Optional model override
-
-Default model is `gpt-4o-mini`.
-
-```bash
-python app.py --transcript "..." --model gpt-4.1-mini
-```
+- Default model is `gpt-4o-mini`.
+- You can override with CLI: `python3 app.py --transcript "..." --model gpt-4.1-mini`.
 
 ## Tests
 
 ```bash
-python -m unittest discover -s tests -p "test_*.py"
+python3 -m unittest discover -s tests -p "test_*.py"
 ```
