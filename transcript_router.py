@@ -71,14 +71,7 @@ class TranscriptPipeline:
             raise RuntimeError(
                 "openai package is not installed. Run: pip install -r requirements.txt"
             )
-
-        api_key = os.getenv("OPENAI_API_KEY", "").strip()
-        if not api_key:
-            raise RuntimeError(
-                "OPENAI_API_KEY is not set. Add it to your shell profile and reload (e.g., source ~/.zshrc)."
-            )
-
-        self.client = OpenAI(api_key=api_key)
+        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
     def run(self, transcript: str) -> dict:
         classification = self.classify(transcript)
