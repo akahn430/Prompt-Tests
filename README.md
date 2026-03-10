@@ -59,3 +59,11 @@ This installs dependencies and launches the Streamlit web interface.
 ```bash
 python3 -m unittest discover -s tests -p "test_*.py"
 ```
+
+
+## Web Interface
+
+The Streamlit UI includes:
+- realtime execution logs in the sidebar (classification, API call, processor step, completion),
+- persistent latest classified intent,
+- persistent processed message output and full JSON payload.
