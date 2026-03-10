@@ -8,4 +8,4 @@ if [[ -z "${OPENAI_API_KEY:-}" ]]; then
 fi
 
 python3 -m pip install -r requirements.txt
-streamlit run web_app.py
+python3 app.py --web

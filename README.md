@@ -1,55 +1,87 @@
 # Transcript Intent Router (GPT-powered)
 
-This app classifies a transcript into one of:
+This app takes a transcript, classifies it into one of:
 
 - `Note`
 - `Inquiry`
 - `Reminder`
 - `Message`
 
-Then it routes the transcript to the matching processor and prints structured JSON.
+It then sends the transcript to the matching processor prompt and returns a final formatted output.
+
+## Why this implementation
+
+The ChatGPT Custom GPT URLs you shared are browser products and are not directly callable over the public OpenAI API by URL. This app mirrors that workflow programmatically using GPT calls and separate prompts for each stage.
 
 ## Setup
 
+1. Create and activate a Python virtual environment (recommended).
+2. Install dependencies:
+
 ```bash
-python3 -m pip install -r requirements.txt
-export OPENAI_API_KEY="your_key_here"
+pip install -r requirements.txt
 ```
 
-If you saved your key in `~/.zshrc`, reload with:
+3. Set your API key:
 
 ```bash
-source ~/.zshrc
+export OPENAI_API_KEY="your_key_here"
 ```
 
 ## Run
 
 ```bash
-# CLI
 python app.py --transcript "Message Mark it's going to rain"
-
-# Demo
-python app.py --demo
-
-# Web UI
-streamlit run web_app.py
 ```
 
-## One-command web launch
+You can also read from stdin:
 
 ```bash
-./run_web.sh
+echo "Blue tall doors look good for the exterior" | python app.py
 ```
 
-This installs dependencies and launches the Streamlit web interface.
+## Output shape
 
-## Notes
+The app prints JSON like:
 
-- Default model is `gpt-4o-mini`.
-- You can override with CLI: `python app.py --transcript "..." --model gpt-4.1-mini`.
+```json
+{
+  "transcript": "Message Mark it's going to rain",
+  "classification": "Message",
+  "processed_output": {
+    "type": "Message",
+    "recipient": "Mark",
+    "message": "It's going to rain",
+    "priority": "normal",
+    "follow_up_needed": false
+  }
+}
+```
+
+## Demo mode (single command)
+
+Run a built-in set of example transcripts in one command:
+
+```bash
+python app.py --demo
+```
+
+This prints a JSON array of processed results for:
+- `Message Mark it's going to rain`
+- `Blue tall doors look good for the exterior`
+- `Remind me tomorrow at 9am to submit the permit`
+- `Can you ask the contractor for the updated timeline?`
+
+## Optional model override
+
+Default model is `gpt-4o-mini`.
+
+```bash
+python app.py --transcript "..." --model gpt-4.1-mini
+```
 
 ## Tests
 
 ```bash
-python3 -m unittest discover -s tests -p "test_*.py"
+python -m unittest discover -s tests -p "test_*.py"
 ```
