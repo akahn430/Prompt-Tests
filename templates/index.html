@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Transcript Router</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="aurora"></div>
+    <main class="shell">
+      <header>
+        <p class="badge">GPT Pipeline</p>
+        <h1>Transcript Intent Router</h1>
+        <p class="subtitle">Paste a transcript, submit, and get classification + structured processor output.</p>
+      </header>
+
+      <section class="card">
+        <label for="transcript">Transcript</label>
+        <textarea id="transcript" placeholder="e.g. Message Mark it's going to rain"></textarea>
+        <div class="row">
+          <button id="submit">Process Transcript</button>
+          <span class="meta">Model: {{MODEL_NAME}}</span>
+        </div>
+      </section>
+
+      <section class="card hidden" id="errorBox"></section>
+
+      <section class="grid hidden" id="resultGrid">
+        <article class="card">
+          <h2>Classification</h2>
+          <p id="classification" class="pill"></p>
+        </article>
+        <article class="card">
+          <h2>Full Output</h2>
+          <pre id="fullOutput"></pre>
+        </article>
+      </section>
+    </main>
+
+    <script>
+      const submitBtn = document.getElementById("submit");
+      const transcriptEl = document.getElementById("transcript");
+      const resultGrid = document.getElementById("resultGrid");
+      const classificationEl = document.getElementById("classification");
+      const fullOutputEl = document.getElementById("fullOutput");
+      const errorBox = document.getElementById("errorBox");
+
+      const setError = (message) => {
+        if (!message) {
+          errorBox.classList.add("hidden");
+          errorBox.textContent = "";
+          return;
+        }
+        errorBox.textContent = message;
+        errorBox.classList.remove("hidden");
+      };
+
+      submitBtn.addEventListener("click", async () => {
+        const transcript = transcriptEl.value.trim();
+        setError("");
+        if (!transcript) {
+          setError("Please enter a transcript first.");
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Processing...";
+
+        try {
+          const res = await fetch("/api/process", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ transcript }),
+          });
+          const data = await res.json();
+          if (!res.ok) {
+            throw new Error(data.error || "Unknown error");
+          }
+
+          classificationEl.textContent = data.classification;
+          fullOutputEl.textContent = JSON.stringify(data, null, 2);
+          resultGrid.classList.remove("hidden");
+        } catch (err) {
+          setError(err.message);
+          resultGrid.classList.add("hidden");
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Process Transcript";
+        }
+      });
+    </script>
+  </body>
+</html>
