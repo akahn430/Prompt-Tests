@@ -58,6 +58,20 @@ The app prints JSON like:
 }
 ```
 
+## Demo mode (single command)
+
+Run a built-in set of example transcripts in one command:
+
+```bash
+python app.py --demo
+```
+
+This prints a JSON array of processed results for:
+- `Message Mark it's going to rain`
+- `Blue tall doors look good for the exterior`
+- `Remind me tomorrow at 9am to submit the permit`
+- `Can you ask the contractor for the updated timeline?`
+
 ## Optional model override
 
 Default model is `gpt-4o-mini`.
