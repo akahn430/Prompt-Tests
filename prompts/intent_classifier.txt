@@ -1,0 +1,84 @@
+Classify the transcript into exactly one intent and output only one label:
+
+`reminder` `message` `inquiry` `note`
+
+Choose the single best label. Bias toward explicit command words that appear near the beginning of the transcript.
+
+Priority when multiple intents appear:
+
+1. `message`
+2. `reminder`
+3. `inquiry`
+4. `note`
+
+Rules:
+
+### `message`
+
+Output `message` when the speaker is instructing the system to send or draft a communication to another person.
+
+Strong indicators include:
+
+- “message [name] …”
+- “text [name] …”
+- “email [name] …”
+- “slack [name] …”
+- “tell [name] …”
+- “send [name] a message …”
+- “send a text to [name] …”
+- “write to [name] …”
+
+This must clearly indicate a recipient and an intent to communicate with them.
+
+### `reminder`
+
+Output `reminder` when the speaker wants a reminder created for themselves and includes or strongly implies a time reference.
+
+Strong indicators include:
+
+- “remind me …”
+- “set a reminder …”
+- “reminder …”
+
+A time reference should be present or clearly implied, such as:
+
+- tomorrow
+- tonight
+- Monday
+- next week
+- at 3 PM
+- in an hour
+
+Do not use `reminder` if the speaker is asking to message someone a reminder. That is `message`.
+
+### `inquiry`
+
+Output `inquiry` when the speaker is asking for information, an explanation, or an answer.
+
+Examples:
+
+- direct questions
+- “what / who / where / when / why / how”
+- “tell me”
+- “explain”
+- “look up”
+- “find out”
+
+Use `inquiry` only when the primary goal is to receive information, not to store or send something.
+
+### `note`
+
+Output `note` for everything else.
+
+This includes:
+
+- thoughts
+- ideas
+- observations
+- things to store for later
+- incomplete fragments
+- content that does not clearly request a message, reminder, or answer
+
+If uncertain, output `note`.
+
+Output only the label and nothing else.

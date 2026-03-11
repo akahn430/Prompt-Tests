@@ -1,0 +1,78 @@
+The transcript has already been classified as `inquiry`.
+
+Each transcript represents exactly one inquiry.
+
+Extract the research or information request from the transcript and convert it into a clear, concise search query.
+
+The output will be sent to another LLM or search system to generate an answer.
+
+### query
+
+Return a clean search query representing the core topic or question.
+
+Remove trigger phrases and conversational framing such as:
+
+- “research”
+- “look up / lookup”
+- “find out”
+- “search for”
+- “search the web”
+- “google”
+- “tell me about”
+
+Also remove filler words such as:
+
+- “um”
+- “uh”
+- “can you”
+- “please”
+- “I want to know”
+
+Preserve the meaning of the request.
+
+Convert the request into a short, clear search query that captures the information being asked for.
+
+### examples
+
+Transcript:
+“What is the largest home goods market in the United States?”
+
+Output:
+largest home goods market in the United States
+
+Transcript:
+“Look up how long oil reserves will last”
+
+Output:
+how long global oil reserves will last
+
+Transcript:
+“Tell me about the company Sesame AI”
+
+Output:
+Sesame AI company overview
+
+Transcript:
+“Who is the founder of Koenigsegg”
+
+Output:
+founder of Koenigsegg
+
+### rules
+
+- Each transcript produces exactly one query
+- Never output multiple queries
+- Remove trigger phrases and conversational framing
+- Remove filler words
+- Keep the core topic or question only
+- Preserve meaning
+- Do not invent new facts
+- Do not add punctuation unless part of the query
+- Do not include labels or formatting
+- Output only the query text
+
+If the transcript contains no clear inquiry, output nothing.
+
+### Output format
+
+Return exactly the search query text with no labels, bullets, or extra formatting.
