@@ -7,19 +7,25 @@ This app classifies a transcript into one of:
 - `Reminder`
 - `Message`
 
-Then it routes the transcript to the matching processor and prints structured JSON.
+It then sends the transcript to the matching processor prompt and returns a final formatted output.
+
+## Why this implementation
+
+The ChatGPT Custom GPT URLs you shared are browser products and are not directly callable over the public OpenAI API by URL. This app mirrors that workflow programmatically using GPT calls and separate prompts for each stage.
 
 ## Setup
 
+1. Create and activate a Python virtual environment (recommended).
+2. Install dependencies:
+
 ```bash
-python3 -m pip install -r requirements.txt
-export OPENAI_API_KEY="your_key_here"
+pip install -r requirements.txt
 ```
 
-If you saved your key in `~/.zshrc`, reload with:
+3. Set your API key:
 
 ```bash
-source ~/.zshrc
+export OPENAI_API_KEY="your_key_here"
 ```
 
 ## Run

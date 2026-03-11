@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 import os
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Callable, Dict
 
 try:
@@ -12,27 +11,54 @@ except ImportError:  # pragma: no cover - handled at runtime if dependency missi
     OpenAI = None  # type: ignore
 
 
-VALID_INTENTS = ("reminder", "message", "inquiry", "note")
-INTENT_TO_DISPLAY = {
-    "message": "Message",
-    "reminder": "Reminder",
-    "inquiry": "Inquiry",
-    "note": "Note",
-}
+VALID_INTENTS = ("Note", "Inquiry", "Reminder", "Message")
 
 
-def _load_prompt_file(filename: str) -> str:
-    path = Path(__file__).parent / "prompts" / filename
-    return path.read_text(encoding="utf-8").strip()
+CLASSIFIER_PROMPT = """You are an intent classifier.
+Classify the transcript into exactly one of these labels:
+- Note
+- Inquiry
+- Reminder
+- Message
 
+Return ONLY the label text and nothing else.
+"""
 
-CLASSIFIER_PROMPT = _load_prompt_file("intent_classifier.txt")
 
 PROCESSOR_PROMPTS: Dict[str, str] = {
-    "message": _load_prompt_file("message_processor.txt"),
-    "reminder": _load_prompt_file("reminder_processor.txt"),
-    "inquiry": _load_prompt_file("inquiry_processor.txt"),
-    "note": _load_prompt_file("note_processor.txt"),
+    "Note": """You are a Note Processor.
+Convert the transcript into a concise, clean note format.
+Return JSON with keys:
+- type (always \"Note\")
+- title
+- note
+- tags (array of short tags)
+""",
+    "Inquiry": """You are an Inquiry Processor.
+Convert the transcript into a clear question/request format.
+Return JSON with keys:
+- type (always \"Inquiry\")
+- question
+- context
+- requested_action
+""",
+    "Reminder": """You are a Reminder Processor.
+Convert the transcript into a reminder format.
+Return JSON with keys:
+- type (always \"Reminder\")
+- reminder
+- due_time
+- priority (low|normal|high)
+""",
+    "Message": """You are a Message Processor.
+Convert the transcript into a sendable message format.
+Return JSON with keys:
+- type (always \"Message\")
+- recipient
+- message
+- priority (low|normal|high)
+- follow_up_needed (boolean)
+""",
 }
 
 
@@ -59,13 +85,13 @@ class TranscriptPipeline:
         processed_output = self.process(transcript, classification)
         return {
             "transcript": transcript,
-            "classification": INTENT_TO_DISPLAY[classification],
+            "classification": classification,
             "processed_output": processed_output,
         }
 
     def classify(self, transcript: str) -> str:
         raw = self._ask_model(CLASSIFIER_PROMPT, transcript)
-        normalized = raw.strip().lower()
+        normalized = raw.strip().title()
 
         if normalized not in VALID_INTENTS:
             normalized = self._fallback_classification(transcript)
@@ -81,7 +107,7 @@ class TranscriptPipeline:
             return parsed
 
         return {
-            "type": INTENT_TO_DISPLAY[classification],
+            "type": classification,
             "raw": raw.strip(),
         }
 
@@ -99,38 +125,13 @@ class TranscriptPipeline:
     @staticmethod
     def _fallback_classification(transcript: str) -> str:
         t = transcript.lower().strip()
-
-        message_tokens = (
-            "message ",
-            "text ",
-            "email ",
-            "slack ",
-            "tell ",
-            "send ",
-            "write to ",
-        )
-        reminder_tokens = ("remind me", "set a reminder", "reminder")
-        inquiry_tokens = (
-            "?",
-            "what",
-            "who",
-            "where",
-            "when",
-            "why",
-            "how",
-            "tell me",
-            "explain",
-            "look up",
-            "find out",
-        )
-
-        if any(tok in t[:40] for tok in message_tokens) or any(tok in t for tok in message_tokens):
-            return "message"
-        if any(tok in t for tok in reminder_tokens):
-            return "reminder"
-        if any(tok in t for tok in inquiry_tokens):
-            return "inquiry"
-        return "note"
+        if t.startswith("message"):
+            return "Message"
+        if t.startswith("remind") or "reminder" in t:
+            return "Reminder"
+        if "?" in t or t.startswith("ask"):
+            return "Inquiry"
+        return "Note"
 
 
 def try_parse_json(text: str):

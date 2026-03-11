@@ -42,7 +42,7 @@ def run_pipeline_with_logs(transcript: str, model: str, sidebar_placeholder) -> 
 
     append_log("Classifying intent", sidebar_placeholder)
     raw_label = pipeline._ask_model(CLASSIFIER_PROMPT, transcript)
-    classification = raw_label.strip().lower()
+    classification = raw_label.strip().title()
 
     if classification not in VALID_INTENTS:
         append_log(f"Classifier returned '{raw_label.strip()}'; applying fallback", sidebar_placeholder)
@@ -57,13 +57,13 @@ def run_pipeline_with_logs(transcript: str, model: str, sidebar_placeholder) -> 
     if isinstance(parsed, dict):
         processed_output = parsed
     else:
-        processed_output = {"type": classification.title(), "raw": raw_processed.strip()}
+        processed_output = {"type": classification, "raw": raw_processed.strip()}
 
     append_log(f"Processing {classification} complete", sidebar_placeholder)
 
     return {
         "transcript": transcript,
-        "classification": classification.title(),
+        "classification": classification,
         "processed_output": processed_output,
     }
 
