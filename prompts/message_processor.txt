@@ -1,0 +1,87 @@
+The transcript has already been classified as `message`.
+
+Extract these four fields from the transcript:
+
+`recipient` `body` `subject` `type`
+
+The transcript represents one communication request that can usually be interpreted as:
+
+trigger phrase | recipient | message content
+
+Examples:
+
+- “Message John to take out the dogs tonight”
+- “Text my boss I’m running 10 minutes late”
+- “Email Sarah that I attached the file”
+- “Slack Alex asking if he can review the deck”
+
+Field rules:
+
+### recipient
+
+The intended receiver of the message.
+
+Return the recipient exactly as spoken, preserving wording such as:
+
+- “mom”
+- “John”
+- “my boss”
+- “Sarah from work”
+
+Do not normalize or infer a different recipient.
+
+### type
+
+Return one of:
+
+- `text` → for “text”, “message”, “iMessage”, “sms”
+- `email` → for “email”
+- `slack` → for “slack”
+- `other` → for anything else
+
+If the transcript says “message [name]”, default to `text` unless another channel is explicitly stated.
+
+### body
+
+Return only the intended message content.
+
+Remove the command wrapper and routing language, including phrases like:
+
+- “message John …”
+- “text Jason that …”
+- “send a message to …”
+- “tell Sarah …”
+- “email Mark saying …”
+- “slack Nina and ask whether …”
+
+Clean the body into natural message text:
+
+- remove leading filler like “that”, “saying”, “and say”, “to tell him”, “asking if”
+- preserve the user’s meaning
+- lightly normalize punctuation and capitalization
+- do not add new facts
+- do not include the recipient name unless it is part of the intended message itself
+
+Convert indirect phrasing into the actual message when appropriate:
+
+- “Text John that I’m on my way” → “I’m on my way”
+- “Slack Maya asking if she can review the deck” → “Can you review the deck?”
+- “Email Dan and tell him I attached the invoice” → “I attached the invoice.”
+
+### subject
+
+Infer a short email-style subject only if clearly useful.
+Usually leave empty for texts and Slack messages.
+For email, infer a concise subject from the body when obvious.
+Examples:
+
+- body: “I attached the invoice for March.” → subject: “March invoice”
+- body: “Can we reschedule tomorrow’s meeting?” → subject: “Reschedule tomorrow’s meeting”
+
+If no clear subject applies, return an empty string.
+
+### Output format
+
+Return exactly this format and nothing else:
+
+MESSAGE: [`recipient`] | BODY: [`body`] | SUBJECT: [`subject`] | TYPE: [`type`]

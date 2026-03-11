@@ -1,0 +1,103 @@
+The transcript has already been classified as `reminder`.
+
+Extract these fields from the transcript:
+
+`task` `time` `allday` `subject`
+
+The transcript contains one reminder request. The goal is to capture:
+
+1. what the user wants to be reminded about
+2. when they want to be reminded
+
+Field rules:
+
+### task
+
+Return the clean reminder content.
+
+Remove reminder-command language such as:
+
+- “remind me to”
+- “set a reminder to”
+- “set a reminder for”
+- “reminder to”
+
+Preserve the user’s meaning and wording as closely as possible, but remove helper words and wrapper phrasing.
+
+Examples:
+
+- “Remind me to call Mom tomorrow” → `call Mom`
+- “Set a reminder for Friday to send the invoice” → `send the invoice`
+- “In two hours remind me to check the oven” → `check the oven`
+
+Include important spoken context such as person, object, purpose, or location.
+
+Do not invent missing details.
+
+### time
+
+Return the scheduling phrase exactly as spoken when possible.
+
+Examples:
+
+- `tomorrow at 3 PM`
+- `next Monday`
+- `Friday morning`
+- `in two hours`
+- `tonight`
+
+If no time is stated, return:
+
+- `none`
+
+### allday
+
+Return:
+
+- `true` if the reminder includes only a day/date and no specific or approximate time
+- `false` if any specific or approximate time is mentioned
+- `false` if `time` is `none`
+
+Examples:
+
+- `tomorrow` → `true`
+- `Friday` → `true`
+- `next Monday` → `true`
+- `tomorrow at 3` → `false`
+- `Friday morning` → `false`
+- `tonight` → `false`
+- `in two hours` → `false`
+
+### subject
+
+Infer a short reminder title from the task.
+
+Rules:
+
+- concise, usually 2–6 words
+- no time words unless essential to the task itself
+- no invented details
+
+Examples:
+
+- `call Mom about the deck` → `Call Mom`
+- `bring my laptop to the office` → `Bring laptop`
+- `check the oven` → `Check oven`
+
+If no clear subject applies, return an empty string.
+
+### Additional rules
+
+- One request = one reminder
+- Never split a single transcript into multiple reminders
+- Combine all spoken context into one reminder
+- Preserve wording closely
+- Do not invent missing details
+- The reminder may appear in any word order
+- If no reminder is actually present, output nothing
+
+### Output format
+
+Return exactly this format and nothing else:
+
+REMINDER: [`task`] | TIME: [`time`] | ALLDAY: [`true/false`] | SUBJECT: [`subject`]

@@ -1,0 +1,76 @@
+The transcript has already been classified as `note`.
+
+Each transcript represents exactly one note.
+
+Extract the note content from the transcript.
+
+A note is any thought, observation, idea, or piece of information the user wants stored.
+
+### note
+
+Return the note content using the user's original wording as closely as possible.
+
+Remove only:
+
+- filler words such as “um”, “uh”, “ah”
+- obvious speech artifacts or noise
+
+Preserve:
+
+- the user's phrasing
+- meaning and intent
+
+Do not:
+
+- rewrite
+- summarize
+- expand
+- invent missing details
+
+The result should read like a natural written version of what the user said.
+
+### exclusions
+
+Remove any leading phrases used to signal a note, such as:
+
+- “note that”
+- “make a note”
+- “remember that”
+- “note to self”
+
+Only return the actual note content.
+
+Examples:
+
+Transcript:
+“Note that the Bali factory prefers wool over cashmere for this jacket”
+
+Output:
+NOTE: [the Bali factory prefers wool over cashmere for this jacket]
+
+Transcript:
+“Idea for the chair product posture detection plus micro vibration feedback”
+
+Output:
+NOTE: [idea for the chair product posture detection plus micro vibration feedback]
+
+Transcript:
+“Remember that Sam liked the chair idea”
+
+Output:
+NOTE: [Sam liked the chair idea]
+
+### rules
+
+- Each transcript produces exactly one note
+- Never split the transcript into multiple notes
+- Preserve wording as closely as possible
+- Do not add punctuation or wording that was not implied
+- Do not include quotation marks inside the brackets
+- If the transcript is empty or contains only noise, return an empty note
+
+### Output format
+
+Return exactly this format and nothing else:
+
+NOTE: [`note text`]
